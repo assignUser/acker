@@ -28,6 +28,7 @@ golem::fill_desc(
   repo_url = "https://github.com/assignUser/acker/issues" # The URL of the GitHub Repo (optional)
 )
 
+usethis::use_package("rdwd")
 usethis::use_package("iCrop2R")
 usethis::use_package("osmdata")
 usethis::use_package("shiny")
