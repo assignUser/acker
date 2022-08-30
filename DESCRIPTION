@@ -2,26 +2,37 @@ Package: acker
 Title: A Shiny App for Crop Simulation
 Version: 0.0.0.9000
 Authors@R: 
-    person("Jacob", "Wujciak-Jens", , "jacob@wujciak", role = c("cre", "aut"))
+    person("Jacob", "Wujciak-Jens", , "jacob@wujciak", role = c("cre", "aut"),
+           comment = c(ORCID = "0000-0002-7281-3989"))
 Description: TODO
 License: MIT + file LICENSE
 URL: https://github.com/assignUser/acker/issues
 BugReports: https://github.com/assignUser/acker/issues/issues
-Imports: 
-    config (>= 0.3.1),
-    dplyr,
-    golem (>= 0.3.3),
-    lubridate,
-    osmdata,
-    purrr,
-    rdwd,
-    sf,
-    shiny (>= 1.7.1),
-    terra,
-    utils
-Encoding: UTF-8
-Extends: iCrop2R
-LazyData: true
-RoxygenNote: 7.2.0
 Depends: 
     R (>= 2.10)
+Imports: 
+    ambient,
+    config (>= 0.3.1),
+    dplyr,
+    glue,
+    golem (>= 0.3.3),
+    iCrop2R,
+    leaflet,
+    lubridate,
+    memoise,
+    osmdata,
+    prompter,
+    purrr,
+    rdwd,
+    shiny (>= 1.7.1),
+    sirad,
+    terra,
+    utils
+Remotes: 
+    assignUser/iCrop2R,
+    assignUser/leaflet@fix-crs-import
+Encoding: UTF-8
+Extends: iCrop2R
+LazyData: false
+RoxygenNote: 7.2.1
+StagedInstall: no
