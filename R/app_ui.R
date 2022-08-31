@@ -18,27 +18,18 @@ app_ui <- function(request) {
           "Map",
           sidebarLayout(
             sidebarPanel(
-                textOutput("osm_error"),
-                textInput("osm_id", "Acker OSM ID", "395695875"),
-                actionButton("get_vec", "Acker Daten abrufen"),
-              actionButton("reset_view", "Ansicht zurücksetzten"),
-              radioButtons("edit_strength", "Pinsel Stärke",
-                choices = list(schwach = 0.1, mittel = 0.2, stark = 0.3), selected = .2,
-                inline = TRUE
-              )  %>% 
-              prompter::add_prompt( position = "bottom/right", type = "info", 
-              message = glue::glue("Zum modifizieren der Bodenqualität 'Shift' (-) oder 'Strg' (+) ",
-              "gedrückt halten und durch die zu verändernden Bereiche fahren."))
+              acker_ui("acker"),
+              map_reset_button("map-map"),
+              map_editor_ui("editor")
             ),
             mainPanel(
-              leaflet::leafletOutput("map", height = 800)
+              map_ui("map")
             )
           )
         ),
         tabPanel("Düngung"),
         tabPanel("Simulation Inputs"),
         tabPanel("Settings")
-        
       ),
      style='max-width: 2000px;')
   )
@@ -66,7 +57,7 @@ golem_add_external_resources <- function() {
     ),
     tags$script('
       $(document).keydown( function (e) {
-    Shiny.onInputChange("key_press", {
+    Shiny.onInputChange("editor-key_press", {
       ctrl: e.ctrlKey,
       shift: e.shiftKey
       });
@@ -74,7 +65,7 @@ golem_add_external_resources <- function() {
   '),
     tags$script('
     $(document).keyup( function (e) {
-       Shiny.onInputChange("key_press",  {
+       Shiny.onInputChange("editor-key_press",  {
         ctrl: false,
         shift: false
        });
