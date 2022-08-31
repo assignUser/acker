@@ -33,7 +33,7 @@ map_ui <- function(id) {
 #' map Server Functions
 #'
 #' @noRd
-map_server <- function(id, acker, noise_layers) {
+map_server <- function(id, acker, water_noise) {
   moduleServer(id, function(input, output, session) {
     blues <- leaflet::colorNumeric("Blues", c(-1, 1), na.color = NA)
     
@@ -46,14 +46,14 @@ map_server <- function(id, acker, noise_layers) {
         )
     )
 
-    map_clear_all(id, acker, noise_layers, session)
+    map_clear_all(id, acker, water_noise, session)
     map_reset_view(id, acker, session)
 
     observe({
       ak <- acker()
-      noise <- noise_layers$water %>%
+      noise <- water_noise$water %>%
         terra::disagg(15, method = "bilinear") %>%
-        terra::mask(., ak)
+        terra::mask(.,ak)
 
       leaflet::leafletProxy("map", session = session) %>%
         leaflet::addRasterImage(
@@ -62,7 +62,7 @@ map_server <- function(id, acker, noise_layers) {
           opacity = 0.8
         )
     }) %>%
-      bindEvent(noise_layers$water, acker())
+      bindEvent(water_noise$water, acker())
 
     return(session)
   })
@@ -91,11 +91,11 @@ map_reset_view <- function(id, acker, ses) {
 #' Clear map
 #'
 #' @noRd
-map_clear_all <- function(id, acker, noise_layers, ses) {
+map_clear_all <- function(id, acker, water_noise, ses) {
   moduleServer(id, function(input, output, session) {
     observe({
       ak <- acker()
-      noise <- noise_layers$water
+      noise <- water_noise$water
       edit_raster <- terra::as.polygons(noise, trunc = FALSE, dissolve = FALSE)
       leaflet::leafletProxy("map", session = ses) %>%
         leaflet::clearImages() %>%

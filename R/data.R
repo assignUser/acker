@@ -23,7 +23,6 @@
       osmdata::osmdata_sf()
   })
   if (inherits(data, "try-error")) {
-    print(data)
     stop("Data retrival from Overpass failed.")
   }
 

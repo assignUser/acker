@@ -48,5 +48,16 @@ function() {
       }
       NA
     })
+n_min <- 80
+bgr_m3 <- 40
+bgr_nh4 <- 3.2 * .75 * bgr_m3
+n_soll <- 220 
+mineral_fert <- n_soll - n_min - bgr_nh4
+min_fert <- n_soll - n_min * (1 + terra::values(akrn2, na.rm = TRUE)) - bgr_nh4
+kas_n <- .27
+ha <- terra::expanse(akrn2, "ha")
+kg_kas <- (mineral_fert / kas_n) * ha
+kg_kas_actual <-{ (min_fert / kas_n) *  (terra::cellSize(akrn2, unit =  "ha") %>% terra::values(na.rm = TRUE))} %>% sum()
+
 }
 

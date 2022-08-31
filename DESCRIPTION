@@ -25,6 +25,7 @@ Imports:
     purrr,
     rdwd,
     shiny (>= 1.7.1),
+    shinythemes,
     sirad,
     terra,
     utils

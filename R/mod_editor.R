@@ -27,7 +27,7 @@ map_editor_ui <- function(id) {
 #' editor Server Functions
 #'
 #' @noRd
-map_editor_server <- function(id, noise_layers, hover_input) {
+map_editor_server <- function(id, water_noise, hover_input) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     # Noise map editor
@@ -42,9 +42,8 @@ map_editor_server <- function(id, noise_layers, hover_input) {
     })
 
     observe({
-      # print(print(edit_add()))
       if (edit_add() || edit_remove()) {
-        current <- noise_layers$water
+        current <- water_noise$water
         pos <- cbind(
           hover_input()$lng,
           hover_input()$lat
@@ -68,11 +67,12 @@ map_editor_server <- function(id, noise_layers, hover_input) {
 
         cells <- c(cell, cells_adj)
         values <- c(value_ctr, values_adj)
-        noise_layers$water[cells] <- values
+        water_noise$water[cells] <- values
       }
+
     }) %>%
       bindEvent(hover_input())
 
-    noise_layers
+    return(water_noise)
   })
 }

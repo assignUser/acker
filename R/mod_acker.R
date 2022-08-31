@@ -19,7 +19,7 @@ acker_ui <- function(id) {
 #' acker Server Functions
 #'
 #' @noRd
-acker_server <- function(id) {
+acker_server <- function(id, water_noise) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -64,10 +64,11 @@ acker_server <- function(id) {
       bindEvent(input$get_vec, ignoreNULL = FALSE)
 
     output$osm_error <- renderText(osm_err_txt())
-    noise_layers <- acker_noise_server(id, acker)
+    water_noise <- acker_noise_server(id, acker, water_noise)
     return(list(
       acker = acker,
-      noise_layers  = noise_layers
+      water_noise  = water_noise,
+      osm_id = reactive(input$osm_id)
     ))
   })
 }
@@ -76,26 +77,25 @@ acker_server <- function(id) {
 #' acker Server Functions
 #'
 #' @noRd
-acker_noise_server <- function(id, acker) {
+acker_noise_server <- function(id, acker, water_noise) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    noise_layers <- reactiveValues()
-    noise_layers$water_base <- reactive({
+    water_noise$water_base <- reactive({
       # This resolution in degress for EPSG:4326 gives a cell area of about 1m^2 <- much too fine
       # 0.000012
       SQM_RES <- 0.0003
-      ak <- acker()
+      ak <- acker() 
       akr <- terra::rast(ak, resolution = SQM_RES)
       terra::rast(akr, vals = acker_noise(akr, freq = 0.05)) %>% terra::mask(., ak)
     }) %>%
-      bindCache(input$osm_id) %>%
-      bindEvent(acker())
+      bindEvent(acker(), ignoreNULL = TRUE)
 
     observe({
-      noise_layers$water <- noise_layers$water_base()
+      water_noise$water <- water_noise$water_base()
     }) %>%
-      bindEvent(noise_layers$water_base())
+      bindEvent(water_noise$water_base())
     
-    return(noise_layers)
+    return(water_noise)
   })
 }
+

@@ -5,10 +5,12 @@
 #' @import shiny
 #' @noRd
 app_server <- function(input, output, session) {
-  acker_list <- acker_server("acker")
+  water_noise <- reactiveValues()
+  acker_list <- acker_server("acker", water_noise)
   acker <- acker_list$acker
-  noise_layers <- acker_list$noise_layers
-  map_session <- map_server("map", acker, noise_layers)
+  water_noise <- acker_list$water_noise
+  map_session <- map_server("map", acker, water_noise)
   hover_input <- map_hover_input("map")
-  noise_layers <- map_editor_server("editor", noise_layers, hover_input)
+  water_noise <- map_editor_server("editor", water_noise, hover_input)
+  fertilizer_server("fertilizer", acker)
 }

@@ -10,7 +10,7 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     
     # Your application UI logic
-    fluidPage(
+    fluidPage(theme = shinythemes::shinytheme("flatly"),
       prompter::use_prompt(),
       titlePanel("ackeR"),
       tabsetPanel(
@@ -27,7 +27,11 @@ app_ui <- function(request) {
             )
           )
         ),
-        tabPanel("Düngung"),
+        tabPanel("Düngung", 
+        sidebarLayout(
+          sidebarPanel(fertilizer_settings("fertilizer")),
+          mainPanel(fertilizer_ui("fertilizer"), style = "padding-top: 15px;")
+        )),
         tabPanel("Simulation Inputs"),
         tabPanel("Settings")
       ),
