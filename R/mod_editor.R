@@ -26,6 +26,10 @@ map_editor_ui <- function(id) {
 
 #' editor Server Functions
 #'
+#' @param id,input,output,session
+#' @param water_noise Reactive containing a [terra::rast()] with
+#'   the noise values for soil quality.
+#' @param hover_input Reactive forwarding `inputs$map_shape_mouseover`
 #' @noRd
 map_editor_server <- function(id, water_noise, hover_input) {
   moduleServer(id, function(input, output, session) {
@@ -69,7 +73,6 @@ map_editor_server <- function(id, water_noise, hover_input) {
         values <- c(value_ctr, values_adj)
         water_noise$water[cells] <- values
       }
-
     }) %>%
       bindEvent(hover_input())
 

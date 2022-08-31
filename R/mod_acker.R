@@ -17,7 +17,10 @@ acker_ui <- function(id) {
 }
 
 #' acker Server Functions
-#'
+#' @param water_noise Reactive containing a [terra::rast()] with
+#'   the noise values for soil quality.
+#' @return A list containing the water_noise, inputs$osm_id and acker
+#'   reactives.
 #' @noRd
 acker_server <- function(id, water_noise) {
   moduleServer(id, function(input, output, session) {
@@ -98,4 +101,3 @@ acker_noise_server <- function(id, acker, water_noise) {
     return(water_noise)
   })
 }
-

@@ -13,6 +13,7 @@ fertilizer_ui <- function(id) {
     htmlOutput(ns("fert_text"), style = "max-width: 500px;")
   )
 }
+
 #' fertilizer settings UI Function
 #'
 #' @description A shiny Module.
@@ -37,8 +38,9 @@ fertilizer_settings <- function(id) {
     actionButton(ns("calc_n"), "Neuberechnen")
   )
 }
+
 #' fertilizer Server Functions
-#'
+#' @param acker reactive containing a [terra::vect()].
 #' @noRd
 fertilizer_server <- function(id, acker) {
   moduleServer(id, function(input, output, session) {
@@ -62,7 +64,7 @@ fertilizer_server <- function(id, acker) {
       ha <- terra::expanse(n_noise, unit = "ha") %>% round(2)
       cells_ha <- terra::cellSize(n_noise, unit = "ha") %>% terra::values(na.rm = TRUE)
 
-      bgr_n <- input$bgr_nh4 * as.numeric(input$bgr_eff) * bgr_m3
+      bgr_n <- input$bgr_nh4 * as.numeric(input$bgr_eff) * input$bgr_m3
       normal_fert <- input$n_soll - input$n_min - bgr_n
       n_mod <- 1 + terra::values(n_noise, na.rm = TRUE)
       precise_nmin <- input$n_min * n_mod
@@ -81,7 +83,7 @@ fertilizer_server <- function(id, acker) {
 
       text2 <- glue::glue(
         "Bei einer teilflächenspezifischen Düngung würden hingegen ",
-        "nur {kg_kas_precise} kg KAS27 benötigt.",
+        "nur {kg_kas_precise} kg KAS27 benötigt. ",
         "Das ist eine Einsparung von {kg_diff_price}€ für diese Anbaufläche oder {round(kg_diff/ha, 2)} kg/ha bzw. {round(kg_diff_price/ha, 2)}€/ha."
       )
       tagList(
@@ -92,9 +94,3 @@ fertilizer_server <- function(id, acker) {
     }) %>% bindEvent(input$calc_n, acker())
   })
 }
-
-## To be copied in the UI
-# mod_fertilizer_ui("fertilizer_1")
-
-## To be copied in the server
-# mod_fertilizer_server("fertilizer_1")

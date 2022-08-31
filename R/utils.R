@@ -28,7 +28,7 @@ get_acker_drought_index <- function(ak) {
   indices <- terra::extract(drought_index, get_acker_center(ak)) %>%
     t() %>%
     data.frame() %>%
-   dplyr::rename(di = ".") %>%
+    dplyr::rename(di = ".") %>%
     transmute(
       year = rownames(.) %>% gsub(".*_(\\d{4})17.*", "\\1", .),
       drought_index = di
@@ -41,7 +41,8 @@ get_di_selection <- function(weather, di) {
   di %>%
     filter(year %in% weather$year) %>%
     mutate(
-      di = round(di, 2),
+      di = round(drought_index, 2),
+      drought_index = NULL,
       min = di == min(di),
       max = di == max(di),
       middle = find_middle(di)
@@ -81,4 +82,11 @@ get_ap_b <- function(xy) {
     terra::rast() %>%
     terra::extract(xy) %>%
     unlist()
+}
+
+ensure_data <- function(names, env = parent.frame()) {
+  exist <- purrr::map_lgl(names, exists, envir = env)
+  if (any(!exist)) {
+    data(list = names[!exist], package = "acker", envir = env)
+  }
 }

@@ -79,7 +79,7 @@ get_station_data <- memoise::memoise(.get_station_data)
 }
 get_id <- memoise::memoise(.get_id)
 
-clean_weather_data <- function(data) {
+.clean_weather_data <- function(data) {
   impute <- function(values) {
     avg <- mean(values, na.rm = TRUE)
     ifelse(is.na(values), avg, values)
@@ -113,3 +113,4 @@ clean_weather_data <- function(data) {
     mutate(across(where(is.numeric), impute)) %>%
     dplyr::as_tibble()
 }
+clean_weather_data <- memoise::memoise(.clean_weather_data)
