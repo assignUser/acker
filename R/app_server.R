@@ -16,5 +16,5 @@ app_server <- function(input, output, session) {
   fertilizer_server("fertilizer", acker)
   weather <- sim_dynamic_inputs("simput", acker, env)
   res <- sim_prepare_run("simput", acker, weather, water_noise)
-  sim_save_output("sim_out", res$results, res$base_sim, water_noise)
+  sim_save_output("simput-export_ui", res$results, res$base_sim, water_noise)
 }

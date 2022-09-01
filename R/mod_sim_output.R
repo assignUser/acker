@@ -7,10 +7,12 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-sim_output_ui2 <- function(id) {
+sim_output_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    tableOutput(ns("sim_summary"))
+    numericInput(ns("export_doy"), "Tag des Jahres für den Export", min = 1, max = 366, step = 1, value = 320),
+    actionButton(ns("save_output"), "Daten Speichern"),
+    textOutput(ns("saved"))
   )
 }
 
@@ -20,31 +22,42 @@ sim_output_ui2 <- function(id) {
 sim_save_output <- function(id, results, base_sim, water_noise) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    output$sim_summary <- renderTable({
+
+    get_result_selection <- function(result, export_doy) {
+      result %>%
+        filter(doy == export_doy) %>%
+        select(NDS, LAI, WVEG, WTOP, WGRN, NDS, HI, starts_with("water_stress"))
+    }
+    create_layer <- function(values, name, base_raster, cells) {
+      lyr <- terra::rast(akr)
+      names(lyr) <- name
+      lyr[cells] <- values
+      lyr
+    }
+
+    out_rast <- reactiveVal()
+    observe({
+      akr <- water_noise$water
+      cell_i <- terra::cells(akr)
+      e_doy <- input$export_doy
+      res <- results()
+      tbl <- purrr::map_dfr(res, get_result_selection, e_doy) %>% dplyr::as_tibble()
+      or <- tbl %>%
+        as.list() %>%
+        purrr::map2(., names(.), create_layer, akr, cell_i) %>%
+        terra::rast()
+      out_rast(or)
+    }) %>% bindEvent(results())
+
+
+    output$saved <- renderText({
       bs <- base_sim()
-      bs$run_simulation()
-      base_result <- bs$result
-      days <- nrow(base_result)
-      summary <- base_result %>% dplyr::summarise(
-        mature = any(MAT == 1),
-        mature_doy = ifelse(mature, doy[[which(MAT == 1) %>% min()]], NA),
-        mature = mature && mature_doy != bs$management$StopDoy,
-        mature_doy = ifelse(mature, mature_doy, NA),
-        max_LAI = max(LAI),
-        max_NDS = min(max(NDS), 1),
-        min_doy = min(doy),
-        max_doy = max(doy),
-        year = unique(year),
-        max_WVEG = max(WVEG),
-        max_WTOP = max(WTOP),
-        max_WGRN = max(WGRN),
-        max_HI = max(HI),
-        sum_irrigation = sum(irrigation_mm)
-      )
-       r <- results()
-      # i <- which(!is.na(r)) %>% min()
-      # r[[i]]
-      summary
-    }) 
+      or <- out_rast()
+
+      file <- glue::glue("{bs$management$Fyear}_Mais_{input$export_doy}.tif")
+      terra::writeRaster(or, file, overwrite = TRUE)
+
+      glue::glue("Daten im aktuellen Verzeichnis gespeichert als: {file}")
+    }) %>% bindEvent(input$save_output)
   })
 }

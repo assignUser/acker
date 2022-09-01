@@ -19,6 +19,7 @@ sim_input_ui <- function(id) {
         ),
       textOutput(ns("sim_text")) %>%
         shinycssloaders::withSpinner(color = "#0dc5c1", proxy.height = 20, id = "sim"),
+      sim_output_ui(ns("export_ui")),
       style = "margin-top: 15px;"
     ),
     mainPanel(
@@ -71,13 +72,7 @@ sim_input_ui <- function(id) {
   )
 }
 
-sim_output_ui <- function(id) {
-  ns <- NS(id)
-  tagList(
-    DT::DTOutput(ns("result_out")) %>%
-      shinycssloaders::withSpinner(color = "#0dc5c1", proxy.height = 20)
-  )
-}
+
 #' sim_input Server Functions
 #'
 #' @noRd
@@ -208,11 +203,9 @@ sim_prepare_run <- function(id, acker, weather, water_noise) {
     sim_list <- reactiveVal()
     observe({
       soil_mod <- input$soil_mod / 100
-      # Don't remove NAs so we can map values back to grid after sim
-      noise_vals <- terra::values(water_noise$water, mat = FALSE)
+      noise_vals <- terra::values(water_noise$water, mat = FALSE, na.rm = TRUE)
       b_sim <- base_sim()
       sims <- noise_vals %>% purrr::map(function(x) {
-        if (!is.na(x)) {
           sim_x <- b_sim$clone()
           fctr <- 1 + soil_mod * x
 
@@ -222,10 +215,7 @@ sim_prepare_run <- function(id, acker, weather, water_noise) {
           sim_x$soil$lower_limit <- sim_x$soil$lower_limit * fctr
           sim_x$management$MAI <- sim_x$management$MAI * fctr
           sim_x$management$MAI <- sim_x$management$MAI1 * fctr
-          x <- sim_x
-        }
-
-        x
+          sim_x
       })
       sim_list(sims)
     }) %>% bindEvent(base_sim())
@@ -233,7 +223,7 @@ sim_prepare_run <- function(id, acker, weather, water_noise) {
     results <- reactiveVal()
     observe({
       sl <- sim_list()
-      res <- sl[7:9] %>% purrr::map( function(.x) {
+      res <- sl %>% purrr::map( function(.x) {
         if (is.environment(.x)) {
           .x$run_simulation()
           return(.x$result)
@@ -246,13 +236,6 @@ sim_prepare_run <- function(id, acker, weather, water_noise) {
     output$sim_text <- renderText({
       "Simulation beendet."
     }) %>% bindEvent(results(), input$start_sim, ignoreInit = TRUE)
-
-    # TODO remove
-    output$result_out <- DT::renderDT({
-      r <- results()
-      i <- which(!is.na(r)) %>% min()
-      r[[i]]
-    }) %>% bindEvent(results())
 
     list(
       results = results,

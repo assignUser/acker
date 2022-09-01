@@ -37,12 +37,9 @@ app_ui <- function(request) {
           )
         ),
         tabPanel(
-          "Simulation Inputs",
+          "Simulation",
           sim_input_ui("simput")
-        ),
-        tabPanel("Results",
-        sim_output_ui2("sim_out"),
-      sim_output_ui("simput"))
+        )
       ),
       style = "max-width: 2000px;"
     )
