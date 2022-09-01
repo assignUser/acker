@@ -53,7 +53,7 @@ jobs:
       - name: Create Dockerfile
         shell: Rscript {0}
         run: golem::add_dockerfile_with_renv(output_dir = "deploy", open = FALSE)
-
+      - run: sed -i  's/acker_base/ghcr.io\/assignuser\/acker_base/g' deploy/Dockerfile
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
