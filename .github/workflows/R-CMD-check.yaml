@@ -33,7 +33,6 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
       
   docker:
-    needs: R-CMD-check
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
