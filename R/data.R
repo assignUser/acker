@@ -1,14 +1,15 @@
-#' TODO document data sets / make it load on attach
-#'
+#' DWD Climate Data Center (CDC): Annual grids of drought index (de Martonne) over Germany, version v1.0
+#' 
 "drought_index"
 
-# TODO Document
-#' data from years with min max and median DI in germany
+
+#' Data from years with min max and median DI in Fermany
 #'
 #' year drought_index
 #' 2002      51.79878
 #' 2005      41.32579
 #' 2018      28.30215
+#' @seealso [acker::drought_index]
 "min_di_weather"
 
 
