@@ -48,7 +48,7 @@ jobs:
           extra-packages: |
             any::attachment
             any::dockerfiler
-            anz::renv
+            any::renv
 
       - name: Create Dockerfile
         shell: Rscript {0}
