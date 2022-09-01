@@ -67,7 +67,7 @@ jobs:
           file: deploy/Dockerfile_base
           context: deploy
           push: true
-          tags: assignuser/acker_base:latest
+          tags: ghcr.io/assignuser/acker_base:latest
 
       - name: Build and push
         uses: docker/build-push-action@v3
@@ -75,4 +75,4 @@ jobs:
           file: deploy/Dockerfile
           context: deploy
           push: true
-          tags: assignuser/acker:latest
+          tags: ghcr.io/assignuser/acker:latest
