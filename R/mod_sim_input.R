@@ -17,8 +17,8 @@ sim_input_ui <- function(id) {
           type = "warning",
           message = "Die Simulation kann mehrere Minuten dauern!"
         ),
-        textOutput(ns("sim_text")) %>%
-          shinycssloaders::withSpinner(color = "#0dc5c1", proxy.height = 20, id = "sim"),
+      textOutput(ns("sim_text")) %>%
+        shinycssloaders::withSpinner(color = "#0dc5c1", proxy.height = 20, id = "sim"),
       style = "margin-top: 15px;"
     ),
     mainPanel(
@@ -43,7 +43,7 @@ sim_input_ui <- function(id) {
             "Automatisch" = 1
           )
         ),
-        numericInput(ns("start_doy"), "Erster möglicher Tag für die Aussaat", min = 1, step = 1, max = 366, value = 170),
+        numericInput(ns("start_doy"), "Erster möglicher Tag für die Aussaat", min = 1, step = 1, max = 366, value = 110),
         numericInput(ns("stop_doy"), "Spätester Tag des Jahres für Ernte", min = 1, step = 1, max = 366, value = 320)
       ), col_6(
         h2("Boden"),
@@ -75,7 +75,7 @@ sim_output_ui <- function(id) {
   ns <- NS(id)
   tagList(
     DT::DTOutput(ns("result_out")) %>%
-          shinycssloaders::withSpinner(color = "#0dc5c1", proxy.height = 20)
+      shinycssloaders::withSpinner(color = "#0dc5c1", proxy.height = 20)
   )
 }
 #' sim_input Server Functions
@@ -170,12 +170,12 @@ sim_prepare_run <- function(id, acker, weather, water_noise) {
 
     # Could be individualized for advanced users via config file in the future.
     loc <- list(tchng = 0, pchng = 1, CO2 = 385, VPDF = 0.75, lat = 38.5)
-    corn <- iCrop2R::crops[34, ]
+    corn <- iCrop2R::crops[22, ]
     management <- reactive({
       w <- sim_weather()
       list(
         Manag = "CornF",
-        FixFind = input$select_find,
+        FixFind = as.numeric(input$select_find),
         Fyear = w$year[[1]],
         yrno = 1,
         SimDoy = input$start_doy,
@@ -184,7 +184,7 @@ sim_prepare_run <- function(id, acker, weather, water_noise) {
         RfreeP = 5,
         SowTmp = NULL,
         SowWat = NULL,
-        water = input$irrigation,
+        water = as.numeric(input$irrigation),
         IRGLVL = 0.5,
         MAI1 = .9,
         MAI = .9,
@@ -198,27 +198,21 @@ sim_prepare_run <- function(id, acker, weather, water_noise) {
     base_sim <- reactiveVal()
 
     observe({
-      print("creating sim")
-
       a <- input$start_sim
       m <- management()
       s <- soil()
       w <- sim_weather()
-
       base_sim(iCrop2R::Simulation$new(corn, loc, m, s, w))
-      print("done")
     }) %>% bindEvent(input$start_sim)
 
     sim_list <- reactiveVal()
     observe({
-      print("creating list")
       soil_mod <- input$soil_mod / 100
       # Don't remove NAs so we can map values back to grid after sim
       noise_vals <- terra::values(water_noise$water, mat = FALSE)
       b_sim <- base_sim()
       sims <- noise_vals %>% purrr::map(function(x) {
         if (!is.na(x)) {
-          print("list")
           sim_x <- b_sim$clone()
           fctr <- 1 + soil_mod * x
 
@@ -230,85 +224,39 @@ sim_prepare_run <- function(id, acker, weather, water_noise) {
           sim_x$management$MAI <- sim_x$management$MAI1 * fctr
           x <- sim_x
         }
-        
+
         x
       })
-      print("done")
       sim_list(sims)
     }) %>% bindEvent(base_sim())
 
     results <- reactiveVal()
     observe({
       sl <- sim_list()
-      res <- purrr::map(sl, function(.x) {
+      res <- sl[7:9] %>% purrr::map( function(.x) {
         if (is.environment(.x)) {
-          print("running sim")
           .x$run_simulation()
           return(.x$result)
         }
         NA
       })
       results(res)
-    }) %>%  bindEvent(sim_list())
+    }) %>% bindEvent(sim_list())
 
     output$sim_text <- renderText({
-      results()
       "Simulation beendet."
     }) %>% bindEvent(results(), input$start_sim, ignoreInit = TRUE)
 
-    output$result_out <- DT::renderDT({
-
-       r <- results()
-      i <- which(!is.na(r)) %>% min()
-      r[[i]]
-    }) %>% bindEvent(results())
-
-    results
-  })
-}
-
-sim_run <- function(id, base_sim, acker, water_noise) {
-  stopifnot(is.reactive(acker))
-  moduleServer(id, function(input, output, session) {
-    sim_list <- reactive({
-      print("creating list")
-      soil_mod <- input$soil_mod / 100
-      # Don't remove NAs so we can map values back to grid after sim
-      noise_vals <- terra::values(water_noise$water, mat = FALSE)
-      b_sim <- base_sim()
-      sims <- noise_vals %>% purrr::map(function(x) {
-        if (!is.na(x)) {
-          sim_x <- b_sim$clone()
-          fctr <- 1 + soil_mod * x
-
-          sim_x$soil$saturation <- sim_x$soil$saturation * fctr
-          sim_x$soil$drained_upper_limit <- sim_x$soil$drained_upper_limit * fctr
-          sim_x$soil$extractable_water <- sim_x$soil$extractable_water * fctr
-          sim_x$soil$lower_limit <- sim_x$soil$lower_limit * fctr
-          sim_x$management$MAI <- sim_x$management$MAI * fctr
-          sim_x$management$MAI <- sim_x$management$MAI1 * fctr
-          x <- sim_x
-        }
-        x
-      })
-      sims
-    }) %>% bindEvent(base_sim())
-
-    results <- reactive({
-      res <- purrr::map(sim_list(), function(.x) {
-        if (!any(is.na(.x))) {
-          print("running sim")
-          .x$run_simulation()
-          return(.x$result)
-        }
-        NA
-      })
-    }) %>% bindEvent(sim_list())
-
+    # TODO remove
     output$result_out <- DT::renderDT({
       r <- results()
       i <- which(!is.na(r)) %>% min()
       r[[i]]
-    })
+    }) %>% bindEvent(results())
+
+    list(
+      results = results,
+      base_sim = base_sim
+    )
   })
 }

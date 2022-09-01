@@ -41,7 +41,8 @@ app_ui <- function(request) {
           sim_input_ui("simput")
         ),
         tabPanel("Results",
-       sim_output_ui("simput"))
+        sim_output_ui2("sim_out"),
+      sim_output_ui("simput"))
       ),
       style = "max-width: 2000px;"
     )

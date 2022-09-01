@@ -15,6 +15,6 @@ app_server <- function(input, output, session) {
   water_noise <- map_editor_server("editor", water_noise, hover_input)
   fertilizer_server("fertilizer", acker)
   weather <- sim_dynamic_inputs("simput", acker, env)
-  results <- sim_prepare_run("simput", acker, weather, water_noise)
-  # results <- sim_run("simput", base_sim, acker, water_noise)
+  res <- sim_prepare_run("simput", acker, weather, water_noise)
+  sim_save_output("sim_out", res$results, res$base_sim, water_noise)
 }
