@@ -1,3 +1,4 @@
+
 #' DWD Climate Data Center (CDC): Annual grids of drought index (de Martonne) over Germany, version v1.0
 #' 
 "drought_index"
@@ -13,9 +14,8 @@
 "min_di_weather"
 
 
-# 729667622 729394749 729394750
-
 .get_acker_vect <- function(...) {
+  browser()
   ids <- list(...) %>%
     unlist() %>%
     paste(collapse = ",")
@@ -28,6 +28,7 @@
   }
 
   vec <- terra::vect(data$osm_polygons)
+  brwoser()
   terra::aggregate(vec)
 }
 get_acker_vect <- memoise::memoise(.get_acker_vect)
