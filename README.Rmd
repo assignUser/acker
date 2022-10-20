@@ -37,7 +37,7 @@ Alternative stellen wir auf ghcr.io ein Docker Image zur Verfügung, dass alle V
 
 ```bash
 # Ggf. ist ein login bei ghcr.io notwendig
-docker run -p 80:80 -v ak.:/output -w "/output" ghcr.io/assignuser/acker:latest
+docker run -p 80:80 -v /output:$(pwd)  -w "/output" ghcr.io/assignuser/acker:latest
 # Anschließend die Web App unter 127.0.0.1:80 aufrufen
 ```
 
