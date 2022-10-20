@@ -29,7 +29,7 @@ sim_save_output <- function(id, results, base_sim, water_noise) {
         select(NDS, LAI, WVEG, WTOP, WGRN, NDS, HI, starts_with("water_stress"))
     }
     create_layer <- function(values, name, base_raster, cells) {
-      lyr <- terra::rast(akr)
+      lyr <- terra::rast(base_raster)
       names(lyr) <- name
       lyr[cells] <- values
       lyr
