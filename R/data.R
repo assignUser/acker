@@ -25,6 +25,7 @@
 
   if (inherits(data, "try-error")) {
     stop("Data retrival from Overpass failed.")
+    sf::NA_crs_ # renv removes unused dependencies
   }
 
   vec <- terra::vect(data$osm_polygons)
