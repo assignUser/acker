@@ -24,6 +24,7 @@ Imports:
     prompter,
     purrr,
     rdwd,
+    sf,
     shiny (>= 1.7.1),
     shinycssloaders,
     shinythemes,
