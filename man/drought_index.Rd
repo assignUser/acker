@@ -3,7 +3,7 @@
 \docType{data}
 \name{drought_index}
 \alias{drought_index}
-\title{TODO document data sets / make it load on attach}
+\title{DWD Climate Data Center (CDC): Annual grids of drought index (de Martonne) over Germany, version v1.0}
 \format{
 An object of class \code{SpatRaster} of dimension 712 x 917 x 27.
 }
@@ -11,6 +11,6 @@ An object of class \code{SpatRaster} of dimension 712 x 917 x 27.
 drought_index
 }
 \description{
-TODO document data sets / make it load on attach
+DWD Climate Data Center (CDC): Annual grids of drought index (de Martonne) over Germany, version v1.0
 }
 \keyword{datasets}

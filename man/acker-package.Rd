@@ -6,7 +6,7 @@
 \alias{acker-package}
 \title{acker: A Shiny App for Crop Simulation}
 \description{
-TODO
+Shinyapp to simulate corn growth in an educational context.
 }
 \seealso{
 Useful links:
@@ -17,7 +17,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Jacob Wujciak-Jens \email{jacob@wujciak}
+\strong{Maintainer}: Jacob Wujciak-Jens \email{jacob@wujciak} (\href{https://orcid.org/0000-0002-7281-3989}{ORCID})
 
 }
 \keyword{internal}
